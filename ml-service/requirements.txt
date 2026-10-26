@@ -1,5 +1,5 @@
 # ML service (Phase 7). Install with: pip install -r ml-service/requirements.txt
-fastapi>=0.110
+fastapi>=0.161.1
 uvicorn>=0.29
 pydantic>=2.6
 scikit-learn>=1.4
