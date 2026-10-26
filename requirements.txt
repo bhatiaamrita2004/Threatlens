@@ -1,0 +1,9 @@
+# Phase 3 introduces the first third-party packages.
+# Phases 1 and 2 need only the Python standard library.
+pandas>=2.2
+numpy>=1.26
+# Phase 3 introduces the first third-party \\
+
+# Phase 5 (machine learning)
+scikit-learn>=1.4
+joblib>=1.3

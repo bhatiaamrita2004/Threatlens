@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: threatlens
+      POSTGRES_USER: threatlens
+      POSTGRES_PASSWORD: threatlens
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U threatlens -d threatlens"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  kafka:
+    image: apache/kafka:4.0.0
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    ports: ["9092:9092"]
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_started }
+    environment:
+      THREATLENS_DB_URL: jdbc:postgresql://postgres:5432/threatlens
+      THREATLENS_DB_USER: threatlens
+      THREATLENS_DB_PASSWORD: threatlens
+      THREATLENS_JWT_SECRET: ${THREATLENS_JWT_SECRET:-dev-only-secret-change-me-to-a-long-random-value}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      THREATLENS_REDIS_HOST: redis
+      THREATLENS_OPENSEARCH_ENABLED: "false"
+    ports: ["8080:8080"]
+
+  ml-service:
+    build: ./ml-service
+    ports: ["8000:8000"]
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        THREATLENS_API_URL: http://backend:8080
+    depends_on: [backend]
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:

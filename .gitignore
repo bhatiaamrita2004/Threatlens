@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Generated synthetic data (regenerate with the event-generator scripts)
+data/raw/*.json
+data/processed/
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/$
+frontend/node_modules/
+frontend/.next/.env
+.env
+frontend/.next/
+frontend/node_modules/
+backend/target/
+__pycache__/
+.DS_Store

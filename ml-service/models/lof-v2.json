@@ -1,0 +1,32 @@
+{
+  "model_version": "lof-v2",
+  "algorithm": "LocalOutlierFactor (novelty mode), inside a log1p + StandardScaler pipeline",
+  "features": [
+    "event_count",
+    "failed_login_count",
+    "login_success_count",
+    "failure_ratio",
+    "offhours_login_count",
+    "connection_count",
+    "unique_ports",
+    "unique_source_ips",
+    "unique_locations",
+    "request_count",
+    "privilege_change_count"
+  ],
+  "n_neighbors": 5,
+  "contamination": 0.01,
+  "training_windows": 371,
+  "distinct_training_patterns": 13,
+  "training_data": "normal_events.json, first 18 hours, no attack labels",
+  "sklearn_version": "1.9.1",
+  "limitations": [
+    "Trained on one synthetic day of normal data; it has not seen real enterprise traffic.",
+    "Scores show how unusual a window is, not whether it is malicious.",
+    "The contamination value is an assumption that sets the cut-off; it is not learned from attacks.",
+    "Normal training windows hold only a handful of distinct patterns (see distinct_training_patterns), so density estimates are rough.",
+    "n_neighbors was picked on validation data, where F1 was flat for k = 2 to 5.",
+    "Unusual logins (new hour or location) are invisible to count features; the rules and baseline cover them.",
+    "Evaluation uses synthetic attacks from the same simulator design, so it measures the designed patterns only."
+  ]
+}

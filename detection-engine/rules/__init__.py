@@ -1,0 +1,1 @@
+"""Explicit detection rules. Each module exposes detect(events) -> list[Alert]."""
