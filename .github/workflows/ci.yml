@@ -63,9 +63,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Scan dependencies for known vulnerabilities
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          exit-code: "0"
+        run: docker run --rm -v "$PWD:/src" aquasec/trivy:latest fs --severity HIGH,CRITICAL --exit-code 0 /src
